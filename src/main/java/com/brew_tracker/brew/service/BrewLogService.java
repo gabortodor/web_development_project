@@ -10,9 +10,11 @@ public interface BrewLogService {
 
     void updateBrewLog(BrewLogDto brewLogDto);
 
-    void deleteBrewLog(BrewLogDto brewLogDto);
+    void deleteBrewLog(int id);
 
     List<BrewLogDto> getAllBrewLogsForUser(String username);
+
+    String getUsernameForLogById(int id);
 
 
 }

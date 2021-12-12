@@ -1,14 +1,16 @@
 package com.brew_tracker.user.service;
 
+import com.brew_tracker.brew.model.BrewLogDto;
+import com.brew_tracker.brew.service.BrewLogService;
 import com.brew_tracker.user.model.UserDto;
 import com.brew_tracker.user.persistence.entity.User;
 import com.brew_tracker.user.persistence.repository.UserRepository;
 import com.brew_tracker.user.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,17 +22,24 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+    private final AuthenticationManager authenticationManager;
+
+    private final BrewLogService brewLogService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, BrewLogService brewLogService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.authenticationManager = authenticationManager;
+        this.brewLogService = brewLogService;
+    }
 
     public String login(String username, String password) throws AuthenticationException {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -38,25 +47,35 @@ public class UserService implements UserDetailsService {
     }
 
     public String register(UserDto user) throws IllegalStateException {
-        if (!userRepository.existsByUsername(user.getUsername())) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userRepository.save(convertDtoToEntity(user));
-            return jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
-        } else {
-            throw new IllegalStateException("Username is already in use");
+        if(userRepository.existsByUsername(user.getUsername())){
+            throw new IllegalStateException("Username is already in use!");
+        }
+        if(userRepository.existsByEmail(user.getEmail()))
+            throw new IllegalStateException("Email is already in use!");
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(convertDtoToEntity(user));
+        jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
+        return "Success";
+    }
+
+    public void delete(String username) {
+        userRepository.deleteByUsername(username);
+        for(BrewLogDto element : brewLogService.getAllBrewLogsForUser(username)){
+            brewLogService.deleteBrewLog(element.getId());
         }
     }
 
-    public void delete(HttpServletRequest req) {
-        userRepository.deleteByUsername(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
+    public void logout(){
+        SecurityContextHolder.clearContext();
     }
 
-    public User search(String username) {
+    public UserDto search(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new IllegalStateException("The user doesn't exist");
         }
-        return user;
+        return convertEntityToDto(user);
     }
 
 
@@ -89,6 +108,16 @@ public class UserService implements UserDetailsService {
                 .email(userDto.getEmail())
                 .password(userDto.getPassword())
                 .roles(userDto.getRoles())
+                .build();
+
+    }
+
+    private UserDto convertEntityToDto(User user){
+        return UserDto.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .roles(user.getRoles())
                 .build();
 
     }

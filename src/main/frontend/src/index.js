@@ -1,18 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import {Provider} from 'react-redux';
-import {BrowserRouter,Routes, Route} from "react-router-dom";
+import {BrowserRouter, Route, Switch} from "react-router-dom";
 import {LoginPage} from "./pages/LoginPage";
-import store from './redux/store';
+import {RegisterPage} from "./pages/RegisterPage";
+import {HomePage} from "./pages/HomePage";
+import "./pages/homepage.scss"
+import "./pages/loginpage.scss"
+
 
 ReactDOM.render(
-  <Provider store={store}>
       <BrowserRouter>
-          <Routes>
-              <Route path="/login" component={LoginPage}/>
-          </Routes>
-      </BrowserRouter>
-  </Provider>,
+          <Switch>
+              <Route exact path="/login" component={LoginPage}/>
+              <Route exact path="/register" component={RegisterPage}/>
+              <Route exact path="/home" component={HomePage}/>
+              <Route exact path="/" component={LoginPage}/>
+          </Switch>
+      </BrowserRouter>,
   document.getElementById("root")
 );

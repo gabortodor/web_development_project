@@ -35,6 +35,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/delete").permitAll()//
                 .antMatchers("/api/get_logs").permitAll()//
                 .antMatchers("/user/register").permitAll()//
+                .antMatchers("/user/info").permitAll()//
+                .antMatchers("/user").permitAll()//
+                .antMatchers("/user/logout").permitAll()//
                 // Disallow everything else..
                 .anyRequest().authenticated();
 

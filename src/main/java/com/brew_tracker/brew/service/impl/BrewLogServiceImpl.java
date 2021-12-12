@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,8 +32,13 @@ public class BrewLogServiceImpl implements BrewLogService {
     }
 
     @Override
-    public void deleteBrewLog(BrewLogDto brewLogDto) {
-        brewLogRepository.delete(convertDtoToEntity(brewLogDto));
+    public void deleteBrewLog(int id) {
+        brewLogRepository.deleteById(id);
+    }
+
+    public String getUsernameForLogById(int id) {
+        BrewLog brewLog =brewLogRepository.findById(id).orElseThrow(() -> new IllegalStateException("No log found"));
+        return brewLog.getUsername();
     }
 
     @Override
@@ -40,7 +46,7 @@ public class BrewLogServiceImpl implements BrewLogService {
         return brewLogRepository.findAllByUsername(username).stream().map(this::convertEntityToDto).collect(Collectors.toList());
     }
 
-    BrewLog convertDtoToEntity(BrewLogDto brewLogDto){
+    BrewLog convertDtoToEntity(BrewLogDto brewLogDto) {
         return BrewLog.builder()
                 .id(brewLogDto.getId())
                 .username(brewLogDto.getUsername())

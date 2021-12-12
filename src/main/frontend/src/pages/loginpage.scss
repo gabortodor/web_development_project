@@ -1,0 +1,72 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo");
+
+
+
+.loginpage, .registerpage{
+    background-color: #feba3b;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display:flex;
+    flex-direction: column;
+
+
+
+    .login, .register{  
+        width: 382px;  
+        overflow: hidden;  
+        margin: auto;  
+        margin: 20 0 0 450px;  
+        padding: 80px;  
+        background-color: whitesmoke;
+        border-radius: 15px ;  
+        display: flex;
+        justify-content: center;
+          
+
+        label{  
+            color: #333;  
+            font-size: 15px;
+            margin-top: 20px;
+            font-family: "Archivo";
+        }  
+
+        input {  
+            width: 300px;  
+            height: 30px;  
+            border: none;  
+           
+            border-radius: 10px;  
+            padding-left: 8px;  
+        }  
+
+        #loginButton{  
+            width: 300px;  
+            height: 30px;  
+            border: none;  
+            font-family: "Archivo";
+            font-size: 17px;
+            font-weight:bold;
+            border-radius: 17px;  
+            margin-top: 20px;
+            padding-left: 7px;  
+            color: #333;
+            background-color: #feba3b; 
+        } 
+
+        #registerButton{  
+            width: 300px;  
+            height: 30px;  
+            border: none;  
+            font-family: "Archivo";
+            font-size: 17px;
+            font-weight:bold;
+            margin-top: 20px;
+            border-radius: 17px;  
+            padding-left: 7px;  
+            color: #feba3b;
+            background-color: #333; 
+        } 
+        
+}  
+}
